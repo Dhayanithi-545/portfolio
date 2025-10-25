@@ -29,21 +29,27 @@ router.post("/register", async (req, res) => {
 
 // this is for login dude
 
-router.post("/login", async (req,res)=>{
-    try {
-        const {email, password} = req.body;
-        const user = await User.findOne({email})
-        if (!user) return res.status(400).json({ message: "Invalid User, first signup" });
+router.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
 
-        const isMatch = await bcrypt.compare(password, user.passwordHash);
-        if (!isMatch) return res.status(400).json({ message: "Invalid Credentials" });
+    if (!email || !password)
+      return res.status(400).json({ message: "Email and password are required" });
 
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
-        res.json({token, username: user.username});
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Server error" });
-    }
-})
+    const user = await User.findOne({ email });
+    if (!user) return res.status(400).json({ message: "Invalid credentials" });
+
+    const isMatch = await bcrypt.compare(password, user.passwordHash);
+    if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
+
+    // JWT: payload includes 'id'
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1d" });
+
+    res.json({ token, username: user.username });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 
 export default router

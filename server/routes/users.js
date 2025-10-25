@@ -22,7 +22,7 @@ router.get("/:username", async (req, res)=>{
 
 // get logged-in user dashboard (edit and preview)
 
-router.get("/me", authMiddleware, async (req,res)=>{
+router.get("/me/:username", authMiddleware, async (req,res)=>{
     try {
         res.json(req.user);
     } catch (error) {
@@ -31,7 +31,7 @@ router.get("/me", authMiddleware, async (req,res)=>{
     }
 })
 
-router.put("/me", authMiddleware, async (req,res)=>{
+router.put("/me/:username", authMiddleware, async (req,res)=>{
     try {
         const updates = req.body;
 
